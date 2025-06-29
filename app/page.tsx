@@ -45,6 +45,19 @@ export default function HomePage() {
       return;
     }
 
+    // Check if the set is already saved
+    const isAlreadySaved = savedSets.some(
+      (savedSet) => savedSet.set_num === set.set_num
+    );
+    if (isAlreadySaved) {
+      toast({
+        title: "Already saved",
+        description: "This LEGO set is already in your collection.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const savedSet: SavedLegoSet = {
       ...set,
       savedAt: new Date().toISOString(),
@@ -59,6 +72,11 @@ export default function HomePage() {
           ...user.unsafeMetadata,
           savedSets: updatedSets,
         },
+      });
+
+      toast({
+        title: "Saved",
+        description: "LEGO set saved to your collection!",
       });
     } catch (error) {
       console.error("Error saving set:", error);
@@ -213,7 +231,7 @@ export default function HomePage() {
               </p>
             </CardHeader>
             <CardContent>
-              <LegoSearch onSave={handleSave} />
+              <LegoSearch onSave={handleSave} savedSets={savedSets} />
             </CardContent>
           </Card>
 

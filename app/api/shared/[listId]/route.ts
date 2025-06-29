@@ -17,7 +17,7 @@ export async function GET(
   { params }: { params: { listId: string } }
 ) {
   try {
-    const listId = params.listId;
+    const { listId } = await params;
 
     // In a real app, you'd store shared lists in a database
     // For this example, we'll use a simple approach with Clerk metadata

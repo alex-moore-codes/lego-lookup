@@ -12,9 +12,10 @@ import { useState } from "react";
 
 interface LegoSearchProps {
   onSave: (set: LegoSet) => void;
+  savedSets: Array<{ set_num: string }>;
 }
 
-export function LegoSearch({ onSave }: LegoSearchProps) {
+export function LegoSearch({ onSave, savedSets }: LegoSearchProps) {
   const [searchId, setSearchId] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<LegoSet | null>(null);
@@ -71,10 +72,6 @@ export function LegoSearch({ onSave }: LegoSearchProps) {
   const handleSave = () => {
     if (result) {
       onSave(result);
-      toast({
-        title: "Saved",
-        description: "LEGO set saved to your collection!",
-      });
     }
   };
 
@@ -106,7 +103,16 @@ export function LegoSearch({ onSave }: LegoSearchProps) {
                 <CardTitle className="text-xl">{result.name}</CardTitle>
                 <p className="text-muted-foreground">Set #{result.set_num}</p>
               </div>
-              <Button onClick={handleSave}>Save</Button>
+              <Button
+                onClick={handleSave}
+                disabled={savedSets.some(
+                  (saved) => saved.set_num === result.set_num
+                )}
+              >
+                {savedSets.some((saved) => saved.set_num === result.set_num)
+                  ? "Already Saved"
+                  : "Save"}
+              </Button>
             </div>
           </CardHeader>
           <CardContent>
