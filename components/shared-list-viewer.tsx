@@ -153,7 +153,7 @@ export function SharedListViewer({ listId }: SharedListViewerProps) {
                     e.stopPropagation();
                     togglePurchased(set.set_num, !set.purchased);
                   }}
-                  disabled={updating === set.set_num}
+                  disabled={updating === set.set_num || set.purchased}
                   className={`w-fit`}
                 >
                   {updating === set.set_num ? (

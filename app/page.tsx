@@ -226,7 +226,12 @@ export default function HomePage() {
               </p>
             </CardHeader>
             <CardContent>
-              <LegoSearch onSave={handleSave} savedSets={savedSets} />
+              <LegoSearch
+                onSave={handleSave}
+                savedSets={savedSets}
+                isAuthenticated={!!user}
+                onSignIn={openSignIn}
+              />
             </CardContent>
           </Card>
 

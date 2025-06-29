@@ -13,9 +13,16 @@ import { toast } from "sonner";
 interface LegoSearchProps {
   onSave: (set: LegoSet) => void;
   savedSets: Array<{ set_num: string }>;
+  isAuthenticated: boolean;
+  onSignIn: () => void;
 }
 
-export function LegoSearch({ onSave, savedSets }: LegoSearchProps) {
+export function LegoSearch({
+  onSave,
+  savedSets,
+  isAuthenticated,
+  onSignIn,
+}: LegoSearchProps) {
   const [searchId, setSearchId] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<LegoSet | null>(null);
@@ -62,6 +69,11 @@ export function LegoSearch({ onSave, savedSets }: LegoSearchProps) {
   };
 
   const handleSave = () => {
+    if (!isAuthenticated) {
+      onSignIn();
+      return;
+    }
+
     if (result) {
       onSave(result);
     }
@@ -71,7 +83,7 @@ export function LegoSearch({ onSave, savedSets }: LegoSearchProps) {
     <div className="space-y-6">
       <div className="flex gap-2">
         <Input
-          placeholder="Enter LEGO set ID (e.g., 75192-1)"
+          placeholder="Enter LEGO set ID (e.g., 75192)"
           value={searchId}
           onChange={(e) => setSearchId(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -97,11 +109,14 @@ export function LegoSearch({ onSave, savedSets }: LegoSearchProps) {
               </div>
               <Button
                 onClick={handleSave}
-                disabled={savedSets.some(
-                  (saved) => saved.set_num === result.set_num
-                )}
+                disabled={
+                  isAuthenticated &&
+                  savedSets.some((saved) => saved.set_num === result.set_num)
+                }
               >
-                {savedSets.some((saved) => saved.set_num === result.set_num)
+                {!isAuthenticated
+                  ? "Sign In to Save"
+                  : savedSets.some((saved) => saved.set_num === result.set_num)
                   ? "Already Saved"
                   : "Save"}
               </Button>
@@ -149,7 +164,7 @@ export function LegoSearch({ onSave, savedSets }: LegoSearchProps) {
                       rel="noopener noreferrer"
                       className="text-primary hover:underline"
                     >
-                      View on Rebrickable →
+                      View on LEGO →
                     </a>
                   </div>
                 )}
