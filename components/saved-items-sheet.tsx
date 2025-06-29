@@ -14,7 +14,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import type { SavedLegoSet } from "@/types/lego";
-import { Check, ExternalLink, Share2, Trash2 } from "lucide-react";
+import { Calendar, Check, Share2, ToyBrick, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -85,42 +85,68 @@ export function SavedItemsSheet({
               </p>
             ) : (
               savedSets.map((set) => (
-                <Card key={set.set_num}>
+                <Card
+                  key={set.set_num}
+                  className={`transition-colors ${
+                    set.set_url ? "cursor-pointer hover:bg-muted/20" : ""
+                  }`}
+                  onClick={() => {
+                    if (set.set_url) {
+                      window.open(set.set_url, "_blank", "noopener,noreferrer");
+                    }
+                  }}
+                >
                   <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <CardTitle className="text-sm">{set.name}</CardTitle>
-                        <p className="text-xs text-muted-foreground">
-                          #{set.set_num}
-                        </p>
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0">
+                        <img
+                          src={set.set_img_url}
+                          alt={set.name}
+                          className="w-16 h-16 object-cover rounded-md bg-muted"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = "none";
+                          }}
+                        />
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onRemove(set.set_num)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1 min-w-0">
+                            <CardTitle className="text-sm truncate">
+                              {set.name}
+                            </CardTitle>
+                            <p className="text-xs text-muted-foreground mb-2">
+                              #{set.set_num}
+                            </p>
+                            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                              <div className="flex items-center gap-1">
+                                <Calendar className="h-3 w-3" />
+                                <span>{set.year}</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <ToyBrick className="h-3 w-3" />
+                                <span>{set.num_parts} parts</span>
+                              </div>
+                            </div>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onRemove(set.set_num);
+                            }}
+                            className="flex-shrink-0"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>
-                        {set.year} • {set.num_parts} parts
-                      </span>
-                      {set.set_url && (
-                        <a
-                          href={set.set_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:text-primary"
-                        >
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
-                      )}
-                    </div>
                     {set.purchased && (
-                      <Badge variant="secondary" className="mt-2">
+                      <Badge variant="secondary" className="mt-0">
                         <Check className="h-3 w-3 mr-1" />
                         Purchased
                       </Badge>
