@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import type { LegoSet, SavedLegoSet } from "@/types/lego";
 import { useClerk, useUser } from "@clerk/nextjs";
-import { Bookmark, LogOut, User } from "lucide-react";
+import { Bookmark, LogOut, ToyBrick, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -149,7 +149,10 @@ export default function HomePage() {
         <header className="border-b">
           <div className="container mx-auto px-4 py-4">
             <div className="flex justify-between items-center">
-              <h1 className="text-2xl font-bold">LEGO Lookup</h1>
+              <div className="flex items-center gap-2">
+                <ToyBrick className="h-6 w-6" />
+                <h1 className="text-2xl font-semibold">LEGO Lookup</h1>
+              </div>
               <Button
                 variant="outline"
                 onClick={() => {
@@ -174,7 +177,10 @@ export default function HomePage() {
       <header className="border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold">LEGO Lookup</h1>
+            <div className="flex items-center gap-2">
+              <ToyBrick className="h-6 w-6" />
+              <h1 className="text-2xl font-semibold">LEGO Lookup</h1>
+            </div>
             <div className="flex items-center gap-4">
               <ThemeSwitcher />
               {user ? (

@@ -1,11 +1,9 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import type { SharedList } from "@/types/lego";
-import { Check, ExternalLink, Loader2 } from "lucide-react";
-import Image from "next/image";
+import { Calendar, Check, Loader2, ToyBrick } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -97,7 +95,7 @@ export function SharedListViewer({ listId }: SharedListViewerProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-4xl mx-auto px-4 space-y-6">
       <div className="text-center">
         <h1 className="text-3xl font-bold">Shared LEGO Collection</h1>
         <p className="text-muted-foreground mt-2">
@@ -108,18 +106,55 @@ export function SharedListViewer({ listId }: SharedListViewerProps) {
 
       <div className="grid gap-4">
         {sharedList.sets.map((set) => (
-          <Card key={set.set_num}>
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div>
+          <Card
+            key={set.set_num}
+            className={`transition-colors ${
+              set.set_url ? "cursor-pointer hover:bg-muted/20" : ""
+            }`}
+            onClick={() => {
+              if (set.set_url) {
+                window.open(set.set_url, "_blank", "noopener,noreferrer");
+              }
+            }}
+          >
+            <CardHeader className="pb-3">
+              <div className="flex gap-6">
+                <div className="flex-shrink-0">
+                  <img
+                    src={set.set_img_url}
+                    alt={set.name}
+                    className="w-32 h-32 object-cover rounded-lg bg-muted"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = "none";
+                    }}
+                  />
+                </div>
+                <div className="flex-1 space-y-2">
                   <CardTitle className="text-xl">{set.name}</CardTitle>
-                  <p className="text-muted-foreground">Set #{set.set_num}</p>
+                  <p className="text-sm text-muted-foreground">
+                    #{set.set_num}
+                  </p>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-4 w-4" />
+                      <span>{set.year}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <ToyBrick className="h-4 w-4" />
+                      <span>{set.num_parts} parts</span>
+                    </div>
+                  </div>
                 </div>
                 <Button
                   variant={set.purchased ? "default" : "outline"}
                   size="sm"
-                  onClick={() => togglePurchased(set.set_num, !set.purchased)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    togglePurchased(set.set_num, !set.purchased);
+                  }}
                   disabled={updating === set.set_num}
+                  className={`w-fit`}
                 >
                   {updating === set.set_num ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -132,62 +167,6 @@ export function SharedListViewer({ listId }: SharedListViewerProps) {
                 </Button>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  {set.set_img_url && (
-                    <Image
-                      src={set.set_img_url || "/placeholder.svg"}
-                      alt={set.name}
-                      width={400}
-                      height={192}
-                      className="w-full h-48 object-contain rounded-lg bg-muted"
-                    />
-                  )}
-                </div>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Year
-                      </p>
-                      <p className="text-lg">{set.year}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Parts
-                      </p>
-                      <p className="text-lg">{set.num_parts}</p>
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">
-                      Theme ID
-                    </p>
-                    <Badge variant="secondary">{set.theme_id}</Badge>
-                  </div>
-                  {set.set_url && (
-                    <div>
-                      <a
-                        href={set.set_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline inline-flex items-center"
-                      >
-                        View on Rebrickable
-                        <ExternalLink className="h-4 w-4 ml-1" />
-                      </a>
-                    </div>
-                  )}
-                  {set.purchased && (
-                    <Badge variant="default">
-                      <Check className="h-3 w-3 mr-1" />
-                      Purchased
-                    </Badge>
-                  )}
-                </div>
-              </div>
-            </CardContent>
           </Card>
         ))}
       </div>
