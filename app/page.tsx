@@ -6,17 +6,16 @@ import { SharedListViewer } from "@/components/shared-list-viewer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
-import { useToast } from "@/hooks/use-toast";
 import type { LegoSet, SavedLegoSet } from "@/types/lego";
 import { useClerk, useUser } from "@clerk/nextjs";
 import { Bookmark, LogOut, User } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function HomePage() {
   const { user, isLoaded } = useUser();
   const { signOut, openSignIn } = useClerk();
   const [savedSets, setSavedSets] = useState<SavedLegoSet[]>([]);
-  const { toast } = useToast();
 
   // Check for shared list in URL
   const [sharedListId, setSharedListId] = useState<string | null>(null);
@@ -37,10 +36,8 @@ export default function HomePage() {
 
   const handleSave = async (set: LegoSet) => {
     if (!user) {
-      toast({
-        title: "Sign in required",
+      toast.error("Sign in required", {
         description: "Please sign in to save LEGO sets.",
-        variant: "destructive",
       });
       return;
     }
@@ -50,10 +47,8 @@ export default function HomePage() {
       (savedSet) => savedSet.set_num === set.set_num
     );
     if (isAlreadySaved) {
-      toast({
-        title: "Already saved",
+      toast.error("Already saved", {
         description: "This LEGO set is already in your collection.",
-        variant: "destructive",
       });
       return;
     }
@@ -74,17 +69,14 @@ export default function HomePage() {
         },
       });
 
-      toast({
-        title: "Saved",
+      toast.success("Saved", {
         description: "LEGO set saved to your collection!",
       });
     } catch (error) {
       console.error("Error saving set:", error);
       setSavedSets(savedSets); // Revert on error
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to save LEGO set. Please try again.",
-        variant: "destructive",
       });
     }
   };
@@ -100,17 +92,14 @@ export default function HomePage() {
           savedSets: updatedSets,
         },
       });
-      toast({
-        title: "Removed",
+      toast.success("Removed", {
         description: "LEGO set removed from your collection.",
       });
     } catch (error) {
       console.error("Error removing set:", error);
       setSavedSets(savedSets); // Revert on error
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to remove LEGO set. Please try again.",
-        variant: "destructive",
       });
     }
   };

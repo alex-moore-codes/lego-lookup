@@ -4,11 +4,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
 import type { LegoSet } from "@/types/lego";
 import { Loader2, Search } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface LegoSearchProps {
   onSave: (set: LegoSet) => void;
@@ -19,14 +19,11 @@ export function LegoSearch({ onSave, savedSets }: LegoSearchProps) {
   const [searchId, setSearchId] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<LegoSet | null>(null);
-  const { toast } = useToast();
 
   const handleSearch = async () => {
     if (!searchId.trim()) {
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Please enter a LEGO set ID",
-        variant: "destructive",
       });
       return;
     }
@@ -37,11 +34,9 @@ export function LegoSearch({ onSave, savedSets }: LegoSearchProps) {
 
       if (!response.ok) {
         if (response.status === 404) {
-          toast({
-            title: "Not Found",
+          toast.error("Not Found", {
             description:
               "LEGO set not found. Please check the ID and try again.",
-            variant: "destructive",
           });
         } else {
           throw new Error("Failed to fetch LEGO set");
@@ -52,16 +47,13 @@ export function LegoSearch({ onSave, savedSets }: LegoSearchProps) {
 
       const data = await response.json();
       setResult(data);
-      toast({
-        title: "Success",
+      toast.success("Success", {
         description: "LEGO set found!",
       });
     } catch (error) {
       console.error("Search error:", error);
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to search for LEGO set. Please try again.",
-        variant: "destructive",
       });
       setResult(null);
     } finally {

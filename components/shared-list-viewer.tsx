@@ -3,11 +3,11 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
 import type { SharedList } from "@/types/lego";
 import { Check, ExternalLink, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface SharedListViewerProps {
   listId: string;
@@ -17,7 +17,6 @@ export function SharedListViewer({ listId }: SharedListViewerProps) {
   const [sharedList, setSharedList] = useState<SharedList | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
-  const { toast } = useToast();
 
   const fetchSharedList = useCallback(async () => {
     try {
@@ -29,15 +28,13 @@ export function SharedListViewer({ listId }: SharedListViewerProps) {
       setSharedList(data);
     } catch (error) {
       console.error("Error fetching shared list:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load shared list.",
-        variant: "destructive",
+      toast.error("Error", {
+        description: "Failed to load shared list. Please try again.",
       });
     } finally {
       setLoading(false);
     }
-  }, [listId, toast]);
+  }, [listId]);
 
   useEffect(() => {
     fetchSharedList();
@@ -66,16 +63,13 @@ export function SharedListViewer({ listId }: SharedListViewerProps) {
         setSharedList({ ...sharedList, sets: updatedSets });
       }
 
-      toast({
-        title: "Updated",
+      toast.success("Updated", {
         description: `Marked as ${purchased ? "purchased" : "not purchased"}`,
       });
     } catch (error) {
       console.error("Error updating purchase status:", error);
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to update purchase status.",
-        variant: "destructive",
       });
     } finally {
       setUpdating(null);

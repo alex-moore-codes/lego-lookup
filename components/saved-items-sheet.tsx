@@ -1,56 +1,62 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Share2, Trash2, ExternalLink, Check } from "lucide-react"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { useToast } from "@/hooks/use-toast"
-import type { SavedLegoSet } from "@/types/lego"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import type { SavedLegoSet } from "@/types/lego";
+import { Check, ExternalLink, Share2, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface SavedItemsSheetProps {
-  savedSets: SavedLegoSet[]
-  onRemove: (setNum: string) => void
-  onShare: () => Promise<string>
-  children: React.ReactNode
+  savedSets: SavedLegoSet[];
+  onRemove: (setNum: string) => void;
+  onShare: () => Promise<string>;
+  children: React.ReactNode;
 }
 
-export function SavedItemsSheet({ savedSets, onRemove, onShare, children }: SavedItemsSheetProps) {
-  const [sharing, setSharing] = useState(false)
-  const { toast } = useToast()
+export function SavedItemsSheet({
+  savedSets,
+  onRemove,
+  onShare,
+  children,
+}: SavedItemsSheetProps) {
+  const [sharing, setSharing] = useState(false);
 
   const handleShare = async () => {
     if (savedSets.length === 0) {
-      toast({
-        title: "No items to share",
+      toast.error("No items to share", {
         description: "Save some LEGO sets first before sharing.",
-        variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
-    setSharing(true)
+    setSharing(true);
     try {
-      const shareUrl = await onShare()
-      await navigator.clipboard.writeText(shareUrl)
-      toast({
-        title: "Link copied!",
+      const shareUrl = await onShare();
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success("Link copied!", {
         description: "Share link has been copied to your clipboard.",
-      })
+      });
     } catch (error) {
-      console.error("Share error:", error)
-      toast({
-        title: "Error",
+      console.error("Share error:", error);
+      toast.error("Error", {
         description: "Failed to create share link. Please try again.",
-        variant: "destructive",
-      })
+      });
     } finally {
-      setSharing(false)
+      setSharing(false);
     }
-  }
+  };
 
   return (
     <Sheet>
@@ -58,7 +64,9 @@ export function SavedItemsSheet({ savedSets, onRemove, onShare, children }: Save
       <SheetContent className="w-[400px] sm:w-[540px]">
         <SheetHeader>
           <SheetTitle>Saved LEGO Sets</SheetTitle>
-          <SheetDescription>Your collection of saved LEGO sets ({savedSets.length} items)</SheetDescription>
+          <SheetDescription>
+            Your collection of saved LEGO sets ({savedSets.length} items)
+          </SheetDescription>
         </SheetHeader>
 
         <div className="mt-6 space-y-4">
@@ -72,7 +80,8 @@ export function SavedItemsSheet({ savedSets, onRemove, onShare, children }: Save
           <div className="space-y-3 max-h-[calc(100vh-200px)] overflow-y-auto">
             {savedSets.length === 0 ? (
               <p className="text-center text-muted-foreground py-8">
-                No saved LEGO sets yet. Search and save some sets to see them here!
+                No saved LEGO sets yet. Search and save some sets to see them
+                here!
               </p>
             ) : (
               savedSets.map((set) => (
@@ -81,9 +90,15 @@ export function SavedItemsSheet({ savedSets, onRemove, onShare, children }: Save
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
                         <CardTitle className="text-sm">{set.name}</CardTitle>
-                        <p className="text-xs text-muted-foreground">#{set.set_num}</p>
+                        <p className="text-xs text-muted-foreground">
+                          #{set.set_num}
+                        </p>
                       </div>
-                      <Button variant="ghost" size="sm" onClick={() => onRemove(set.set_num)}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onRemove(set.set_num)}
+                      >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -94,7 +109,12 @@ export function SavedItemsSheet({ savedSets, onRemove, onShare, children }: Save
                         {set.year} • {set.num_parts} parts
                       </span>
                       {set.set_url && (
-                        <a href={set.set_url} target="_blank" rel="noopener noreferrer" className="hover:text-primary">
+                        <a
+                          href={set.set_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:text-primary"
+                        >
                           <ExternalLink className="h-3 w-3" />
                         </a>
                       )}
@@ -113,5 +133,5 @@ export function SavedItemsSheet({ savedSets, onRemove, onShare, children }: Save
         </div>
       </SheetContent>
     </Sheet>
-  )
+  );
 }
