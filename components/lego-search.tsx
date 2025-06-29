@@ -1,23 +1,24 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Search, Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { useToast } from "@/hooks/use-toast"
-import type { LegoSet } from "@/types/lego"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import type { LegoSet } from "@/types/lego";
+import { Loader2, Search } from "lucide-react";
+import Image from "next/image";
+import { useState } from "react";
 
 interface LegoSearchProps {
-  onSave: (set: LegoSet) => void
+  onSave: (set: LegoSet) => void;
 }
 
 export function LegoSearch({ onSave }: LegoSearchProps) {
-  const [searchId, setSearchId] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<LegoSet | null>(null)
-  const { toast } = useToast()
+  const [searchId, setSearchId] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<LegoSet | null>(null);
+  const { toast } = useToast();
 
   const handleSearch = async () => {
     if (!searchId.trim()) {
@@ -25,56 +26,57 @@ export function LegoSearch({ onSave }: LegoSearchProps) {
         title: "Error",
         description: "Please enter a LEGO set ID",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
     try {
-      const response = await fetch(`/api/lego/${searchId.trim()}`)
+      const response = await fetch(`/api/lego/${searchId.trim()}`);
 
       if (!response.ok) {
         if (response.status === 404) {
           toast({
             title: "Not Found",
-            description: "LEGO set not found. Please check the ID and try again.",
+            description:
+              "LEGO set not found. Please check the ID and try again.",
             variant: "destructive",
-          })
+          });
         } else {
-          throw new Error("Failed to fetch LEGO set")
+          throw new Error("Failed to fetch LEGO set");
         }
-        setResult(null)
-        return
+        setResult(null);
+        return;
       }
 
-      const data = await response.json()
-      setResult(data)
+      const data = await response.json();
+      setResult(data);
       toast({
         title: "Success",
         description: "LEGO set found!",
-      })
+      });
     } catch (error) {
-      console.error("Search error:", error)
+      console.error("Search error:", error);
       toast({
         title: "Error",
         description: "Failed to search for LEGO set. Please try again.",
         variant: "destructive",
-      })
-      setResult(null)
+      });
+      setResult(null);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleSave = () => {
     if (result) {
-      onSave(result)
+      onSave(result);
       toast({
         title: "Saved",
         description: "LEGO set saved to your collection!",
-      })
+      });
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -87,7 +89,11 @@ export function LegoSearch({ onSave }: LegoSearchProps) {
           className="flex-1"
         />
         <Button onClick={handleSearch} disabled={loading}>
-          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+          {loading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Search className="h-4 w-4" />
+          )}
           Search
         </Button>
       </div>
@@ -107,9 +113,11 @@ export function LegoSearch({ onSave }: LegoSearchProps) {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 {result.set_img_url && (
-                  <img
+                  <Image
                     src={result.set_img_url || "/placeholder.svg"}
                     alt={result.name}
+                    width={400}
+                    height={256}
                     className="w-full h-64 object-contain rounded-lg bg-muted"
                   />
                 )}
@@ -117,16 +125,22 @@ export function LegoSearch({ onSave }: LegoSearchProps) {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Year</p>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Year
+                    </p>
                     <p className="text-lg">{result.year}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Parts</p>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Parts
+                    </p>
                     <p className="text-lg">{result.num_parts}</p>
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Theme ID</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Theme ID
+                  </p>
                   <Badge variant="secondary">{result.theme_id}</Badge>
                 </div>
                 {result.set_url && (
@@ -147,5 +161,5 @@ export function LegoSearch({ onSave }: LegoSearchProps) {
         </Card>
       )}
     </div>
-  )
+  );
 }
